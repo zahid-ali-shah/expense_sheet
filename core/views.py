@@ -5,9 +5,10 @@ import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.views import View
 
-from core.helpers import get_expense_icon, get_pre_month
+from core.helpers import get_expense_icon, get_pre_month, get_next_month
 from core.models import (
     DailyExpense,
     TypeOfPaymentModes,
@@ -75,10 +76,14 @@ class BankView(LoginRequiredMixin, View):
 
     def get(self, request):
         year, month, _, mode_dict = get_mode_current_status(request, False)
+        m_previous = get_pre_month(month, year)
+        m_next = get_next_month(month, year)
         return render(request, 'core/bank.html', {
             'month': calendar.month_name[month],
             'year': year,
-            'mode_dict': mode_dict
+            'mode_dict': mode_dict,
+            'next': f"{reverse('bank')}?month={m_next[0]}&year={m_next[1]}",
+            'previous': f"{reverse('bank')}?month={m_previous[0]}&year={m_previous[1]}",
         })
 
 

@@ -14,6 +14,18 @@
 {% block content %}
 
     <div class="mx-3">
+        <div>
+            <nav aria-label="...">
+              <ul class="pagination">
+                <li class="page-item">
+                  <a class="page-link" href="{{ previous }}">Previous</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="{{ next }}">Next</a>
+                </li>
+              </ul>
+            </nav>
+        </div>
         <div class="row">
             {% for name, mode in mode_dict.items %}
                 <div class="col-4">
@@ -38,29 +50,29 @@
                                     </td>
                                 </tr>
 
-                                {% if forloop.last %}
-                                    <tr class="bg-info">
-                                    <th scope="row">Total</th>
-                                    <th scope="row"
-                                        class="{% if mode.sum > 0 %}text-success{% else %}text-danger{% endif %}">
-                                        {{ mode.sum|floatformat:2|intcomma|cut:"-" }}
-                                    </th>
-                                    </tr>
-                                    <tr>
-                                    <td>OB</td>
-                                        <td class="{% if mode.ob > 0 %}text-success{% else %}text-danger{% endif %}">
-                                            {{ mode.ob|intcomma|cut:"-" }}
-                                        </td>
-                                    </tr>
-                                    <tr class="bg-info">
-                                    <th scope="row">CB</th>
-                                    <th scope="row"
-                                        class="{% if mode.sum > 0 %}text-success{% else %}text-danger{% endif %}">
-                                        {{ mode.cb|floatformat:2|intcomma|cut:"-" }}
-                                    </th>
-                                    </tr>
-                                {% endif %}
+                                
                             {% endfor %}
+                        
+                            <tr class="bg-info">
+                            <th scope="row">Total</th>
+                            <th scope="row"
+                                class="{% if mode.sum > 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ mode.sum|floatformat:2|intcomma|cut:"-" }}
+                            </th>
+                            </tr>
+                            <tr>
+                            <td>OB</td>
+                                <td class="{% if mode.ob > 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ mode.ob|intcomma|cut:"-" }}
+                                </td>
+                            </tr>
+                            <tr class="bg-info">
+                            <th scope="row">CB</th>
+                            <th scope="row"
+                                class="{% if mode.sum > 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ mode.cb|floatformat:2|intcomma|cut:"-" }}
+                            </th>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

@@ -8,7 +8,7 @@ from core.models import PaymentTransaction, MonthlyBalance
 
 
 @receiver(post_save, sender=PaymentTransaction, dispatch_uid=None)
-def update_stock(sender, instance, **kwargs):
+def update_balance(sender, instance, **kwargs):
     mode = instance.payment_mode
     year = instance.date.year
     month = instance.date.month

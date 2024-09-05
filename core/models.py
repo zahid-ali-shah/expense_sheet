@@ -24,6 +24,7 @@ class DailyExpense(TimeStampedModel):
     )
     transaction = models.OneToOneField('PaymentTransaction', on_delete=models.RESTRICT)
     is_loan = models.BooleanField(default=False, help_text="Whether this expense is a loan")
+    trip = models.ForeignKey('Trip', on_delete=models.RESTRICT, null=True, blank=True)
 
     @staticmethod
     def get_all_expenses(user, month, year):
@@ -70,7 +71,7 @@ class PaymentTransaction(TimeStampedModel):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='payment_transactions'
     )
     is_deposited = models.BooleanField(default=False)
-    comment = models.TextField(blank=True)
+    comment = models.TextField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.is_deposited:
@@ -146,3 +147,18 @@ class MonthlyBalance(TimeStampedModel):
             user=user, month=month, year=year, payment_mode=mode
         ).first()
         return ob_object.cb if ob_object else 0
+
+
+class Trip(TimeStampedModel):
+    location = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    distance = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Distance (KM)')
+
+    @property
+    def cost(self):
+        return abs(self.dailyexpense_set.aggregate(total_cost=Sum('transaction__amount'))['total_cost'])
+
+    def __str__(self):
+        return f'{self.id} - {self.location}'

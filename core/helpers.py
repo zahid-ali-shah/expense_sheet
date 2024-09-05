@@ -14,9 +14,19 @@ def get_expense_icon(payment_type):
 
 def get_pre_month(month, year):
     if month == 1:
-        previous_month = 12
+        month = 12
         year = year - 1
     else:
-        previous_month = month - 1
+        month = month - 1
         year = year
-    return previous_month, year
+    return month, year
+
+
+def get_next_month(month, year):
+    if month == 12:
+        month = 1
+        year = year + 1
+    else:
+        month = month + 1
+        year = year
+    return month, year
