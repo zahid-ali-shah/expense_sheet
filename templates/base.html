@@ -1,93 +1,194 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Django Auth Tutorial{% endblock %}</title>
-
-    {% load static bootstrap5 %}
-    {% bootstrap_css %}
-    <link rel="stylesheet" href="{% static 'css/vendor/jquery-ui.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/vendor/fontawesome-all.min.css' %}">
+    <title>{% block title %}Expense Sheet{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Material Icons and Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Base Styles -->
+    <style>
+        :root {
+            --primary-color: {{ theme.primary_color }};
+            --secondary-color: {{ theme.secondary_color }};
+            --accent-color: {{ theme.accent_color }};
+            --background-color: {{ theme.background_color }};
+            --error-color: {{ theme.error_color }};
+            --surface-color: {{ theme.surface_color }};
+            --on-primary-color: {{ theme.on_primary_color }};
+            --on-secondary-color: {{ theme.on_secondary_color }};
+            --drawer-width: 280px;
+            --top-nav-height: 64px;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary">
-        <div class="container-fluid">
-            <button
-                class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-            >
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <a class="navbar-brand mt-2 mt-lg-0" href="#">
-                    <img
-                        src="{% static 'icons/dollar-bag.svg' %}"
-                        height="15"
-                        alt="Expense Sheet"
-                        loading="lazy"
-                    />
-                </a>
-                <!-- Left links -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'bank' %}">Statements</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Reports</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Zakat</a>
-                    </li>
-                </ul>
-
-                <div class="d-flex align-items-center">
-                    <ul class="navbar-nav mb-2 mb-lg-0">
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <input class="form-control date-picker" placeholder="Select date" aria-label="Date picker" />
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-primary" href="#">{{ user.get_full_name }}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
+    <!-- Top Navigation -->
+    <header class="top-nav">
+        <div class="nav-wrapper">
+            {% if user.is_authenticated %}
+                <button class="menu-trigger material-icons" id="menuToggle">menu</button>
+            {% endif %}
+            <a href="{% url 'home' %}" class="brand-logo">
+                <i class="material-icons">home</i>
+                <span>My Site</span>
+            </a>
+            <div class="nav-actions">
+                {% if user.is_authenticated %}
+                    <div class="user-menu">
+                        <button class="user-trigger" id="userMenuTrigger">
+                            <img src="{{ user.avatar_url|default:'/static/images/default-avatar.png' }}"
+                                 alt="Avatar"
+                                 class="user-avatar">
+                            <span>{{ user.full_name }}</span>
+                            <i class="material-icons">arrow_drop_down</i>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="{% url 'bank' %}" class="dropdown-item">
+                                <i class="material-icons">account_circle</i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="{% url 'bank' %}" class="dropdown-item">
+                                <i class="material-icons">settings</i>
+                                <span>Settings</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item logout-button">
+                                    <i class="material-icons">exit_to_app</i>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                            <!-- Form for selecting month and year -->
+                {% else %}
+                    <div class="auth-buttons">
+                        <a href="{% url 'bank' %}" class="nav-button">
+                            <i class="material-icons">login</i>
+                            <span>Login</span>
+                        </a>
+                        <a href="{% url 'bank' %}" class="nav-button primary">
+                            <i class="material-icons">person_add</i>
+                            <span>Sign Up</span>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
-    </nav>
-    <!-- Navbar -->
-
-    <main class="container mt-3">
-        {% block content %}
-        {% endblock %}
+    </header>
+    {% if user.is_authenticated %}
+    <!-- Side Navigation -->
+    <aside class="side-nav" id="sideNav">
+        <div class="side-nav-content">
+            <div class="nav-section">
+                <h3>Main Navigation</h3>
+                <ul>
+                    <li class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                        <a href="{% url 'bank' %}">
+                            <i class="material-icons">dashboard</i>
+                            <span>Bank</span>
+                        </a>
+                    </li>
+                    <!-- Add more navigation items here -->
+                </ul>
+            </div>
+            <div class="nav-section">
+                <h3>Quick Actions</h3>
+                <ul>
+                    <!-- Add quick action items here -->
+                </ul>
+            </div>
+        </div>
+    </aside>
+    {% endif %}
+    <!-- Main Content -->
+    <main class="main-content {% if user.is_authenticated %}with-sidebar{% endif %}">
+        <div class="content-wrapper">
+            <div class="primary-content">
+                {% block content %}{% endblock %}
+            </div>
+            {% if user.is_authenticated %}
+            <aside class="secondary-content">
+                {% block secondary_content %}
+                    <!-- Default secondary content here -->
+                {% endblock %}
+            </aside>
+            {% endif %}
+        </div>
     </main>
-
+    <!-- Footer -->
+    <footer class="page-footer">
+        <div class="footer-content">
+            <div class="footer-main">
+                <div class="footer-section">
+                    <h4>About Us</h4>
+                    <p>Brief description about your site</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <!-- Add social media links here -->
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>
+                    <i class="material-icons">copyright</i>
+                    <span>{{ current_year }} My Site. All rights reserved.</span>
+                </p>
+            </div>
+        </div>
+    </footer>
     <!-- Scripts -->
-    {% bootstrap_javascript %}
-    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'js/vendor/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'js/vendor/fontawesome-all.js' %}"></script>
+    <script src="{% static 'js/theme-switcher.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sideNav = document.getElementById('sideNav');
+            const mainContent = document.querySelector('.main-content');
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    sideNav.classList.toggle('expanded');
+                    mainContent.classList.toggle('nav-expanded');
+                });
+            }
+
+            const userTrigger = document.getElementById('userMenuTrigger');
+            const userDropdown = document.getElementById('userDropdown');
+
+            if (userTrigger) {
+                userTrigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!userDropdown.contains(e.target) && !userTrigger.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 
 </html>

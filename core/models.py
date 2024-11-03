@@ -52,12 +52,21 @@ class TypeOfPaymentModes(models.TextChoices):
     BANK = "BN", _("Bank transaction")
 
 
+class CurrencyChoices(models.TextChoices):
+    USD = "USD", _("US Dollar")
+    PKR = "PKR", _("Pakistani Rupee")
+    EUR = "EUR", _("Euro")
+    GBP = "GBP", _("British Pound")
+
+
 class PaymentMode(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
     type = models.CharField(max_length=2, choices=TypeOfPaymentModes, default=TypeOfPaymentModes.CASH)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     is_active = models.BooleanField(default=True)
     bg_color = models.CharField(max_length=6, default='175175')
+    currency = models.CharField(max_length=3, choices=CurrencyChoices.choices, default=CurrencyChoices.PKR)
+    conversion_rate = models.DecimalField(max_digits=10, decimal_places=4, default=1.0000)
 
     def __str__(self):
         return f'{self.name}'

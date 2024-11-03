@@ -13,7 +13,7 @@
 
 {% block content %}
 
-    <div class="mx-3">
+    <div class="row">
         <div>
             <nav aria-label="...">
               <ul class="pagination">
@@ -28,9 +28,14 @@
         </div>
         <div class="row">
             {% for name, mode in mode_dict.items %}
-                <div class="col-4">
-                    <table class="table table-striped table-bordered table-hover table-sm">
-                        <thead class="text-light" style="background:#{{ mode.bg_color }}">
+                
+                {% if forloop.counter0|divisibleby:3 and not forloop.first %}
+                    </div><div class="row">
+                {% endif %}
+                
+                <div class="col s4">
+                    <table>
+                        <thead>
                         <tr>
                             <th scope="row" class="text-center" colspan="5">
                                 {{ month }} {{ year }} - {{ name }}
@@ -53,7 +58,7 @@
                                 
                             {% endfor %}
                         
-                            <tr class="bg-info">
+                            <tr>
                             <th scope="row">Total</th>
                             <th scope="row"
                                 class="{% if mode.sum > 0 %}text-success{% else %}text-danger{% endif %}">

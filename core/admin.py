@@ -76,7 +76,7 @@ class DailyExpenseAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentMode)
 class PaymentModeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'uuid', 'name', 'type', 'is_active', 'bg_color_code')
+    list_display = ('id', 'uuid', 'name', 'type', 'currency', 'conversion_rate', 'is_active', 'bg_color_code')
     search_fields = ('name',)
     list_filter = ('type', 'is_active')
 

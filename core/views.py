@@ -14,7 +14,8 @@ from core.models import (
     TypeOfPaymentModes,
     PaymentTransaction,
     PaymentMode,
-    MonthlyBalance
+    MonthlyBalance,
+    CurrencyChoices,
 )
 
 logger = logging.getLogger(__name__)
@@ -103,19 +104,26 @@ def get_mode_current_status(request, short):
         transactions = PaymentTransaction.get_all_name(request.user, month, year, mode)
         ob = MonthlyBalance.get_ob(request.user, month, year, mode)
         sum_total = PaymentTransaction.get_queryset_sum(transactions)
-        mode_dict[mode.name] = {
-            'transactions': transactions,
-            'bg_color': mode.bg_color,
-            'sum': sum_total,
-            'ob': ob,
-            'cb': sum_total + ob
-        }
-        mode_dict_val = mode_dict[mode.name]
-        total = mode_dict_val['cb'] + total
 
-        if not short:
-            mode_dict_val['transactions'] = transactions
-            mode_dict_val['ob'] = ob
-            mode_dict[mode.name] = mode_dict_val
+        if short:
+            mode_dict[mode.name] = {
+                'cb': (sum_total + ob) * mode.conversion_rate
+            }
+            total = mode_dict[mode.name]['cb'] + total
+        else:
+            mode_dict[mode.name] = {
+                'transactions': transactions,
+                'bg_color': mode.bg_color,
+                'sum': sum_total,
+                'ob': ob,
+                'cb': sum_total + ob
+            }
+            mode_dict_val = mode_dict[mode.name]
+            total = mode_dict_val['cb'] + total
+
+            if not short:
+                mode_dict_val['transactions'] = transactions
+                mode_dict_val['ob'] = ob
+                mode_dict[mode.name] = mode_dict_val
 
     return year, month, total, mode_dict

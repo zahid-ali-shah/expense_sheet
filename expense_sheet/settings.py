@@ -48,9 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debug_toolbar',
     'django.contrib.humanize',
-    'bootstrap5',
     'account',
     'core',
+    'apps.theme'
 ]
 
 MIDDLEWARE = [

@@ -7,126 +7,103 @@
 
 {% block title %}Home{% endblock %}
 
-{% block header %}
-
-{% endblock %}
-
 {% block content %}
-
-    <div class="mx-3">
-        <div class="row">
-            <div class="col-8">
-                <table class="table table-striped table-bordered table-hover table-sm">
-                    <thead class="bg-success text-light">
-                    <tr>
-                        <th scope="row" class="text-center" colspan="5">
-                            {{ month }} {{ year }} - Expenses
-                        </th>
-                    </tr>
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Item</th>
-                        <th scope="col">Expense</th>
-                        <th scope="col">Sum</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for date, expense in expenses.items %}
-                        {% if expense %}
-                            {% for obj in expense %}
-                                <tr class="{% if date|is_today %}bg-warning{% endif %}">
-                                    {% if forloop.first %}
-                                        <th scope="row" rowspan="{{ expense|length }}" style='vertical-align: middle;'>
-                                            {{ obj.transaction.date|date:"D, M d, Y" }}
-                                        </th>
-                                    {% endif %}
-                                    <td data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                        title="{{ obj.transaction.comment }}">
-                                        <i class="{{ obj.icon }}"></i>
-                                        {{ obj.item }}
-                                        {% if obj.transaction.comment %}
-                                            <i class="fa-solid fa-circle-info float-end"></i>
-                                        {% endif %}
-                                    </td>
-                                    <td class="{% if obj.transaction.is_deposited %}text-success{% else %}text-danger{% endif %}">
-                                        {{ obj.transaction.amount|intcomma }}
-                                    </td>
-                                    {% if forloop.first %}
-                                        <th rowspan="{{ expense|length }}"
-                                            style='vertical-align: middle;'>{% sum_attribute expense %}
-                                        </th>
-                                    {% endif %}
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr class="{% if date|is_today %}bg-warning{% endif %}">
-                                <th scope="row">
-                                    {{ date|date:"D, M d, Y" }}
-                                </th>
-                                <td></td>
-                                <td>0.00</td>
-                                <td>0.00</td>
-                            </tr>
-                        {% endif %}
-                        
-                        {% if forloop.last %}
-                            <tr class="bg-info">
-                            <th scope="row" colspan="3">Total</th>
-                            <th scope="row"
-                                class="{% if total_expense > 0 %}text-success{% else %}text-danger{% endif %}">
-                                {{ total_expense|intcomma|cut:"-" }}
-                            </th>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="col">
-                <table class="table table-striped table-bordered table-hover table-sm">
-                    <thead class="bg-success text-light">
-                    <tr>
-                        <th scope="row" class="text-center" colspan="2">{{ month }} {{ year }}</th>
-                    </tr>
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Amount</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        {% for name, mode in mode_dict.items %}
-                            <tr>
-                                <td>{{ name }}</td>
-                                <td>{{ mode.cb|floatformat:2|intcomma }}</td>
-                            </tr>
-                        {% endfor %}
-                        <tr class="bg-danger">
-                            <th scope="row" class="text-light">Total</th>
-                            <th scope="row" class="text-light">{{ total|floatformat:2|intcomma }}</th>
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th class="center-align" colspan="5">{{ month }} {{ year }} - Expenses</th>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <th>Item</th>
+                <th>Expense</th>
+                <th>Sum</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for date, expense in expenses.items %}
+                {% if expense %}
+                    {% for obj in expense %}
+                        <tr class="{% if date|is_today %}amber lighten-4{% endif %}">
+                            {% if forloop.first %}
+                                <td rowspan="{{ expense|length }}" class="center-align" style="vertical-align: middle;">
+                                    {{ obj.transaction.date|date:"D, M d, Y" }}
+                                </td>
+                            {% endif %}
+                            <td class="tooltipped" data-position="bottom" data-tooltip="{{ obj.transaction.comment }}">
+                                <i class="{{ obj.icon }}"></i>
+                                {{ obj.item }}
+                                {% if obj.transaction.comment %}
+                                    <i class="material-icons right">info</i>
+                                {% endif %}
+                            </td>
+                            <td class="{% if obj.transaction.is_deposited %}green-text{% else %}red-text{% endif %}">
+                                {{ obj.transaction.amount|intcomma }}
+                            </td>
+                            {% if forloop.first %}
+                                <td rowspan="{{ expense|length }}" style="vertical-align: middle;">
+                                    {% sum_attribute expense %}
+                                </td>
+                            {% endif %}
                         </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    {% endfor %}
+                {% else %}
+                    <tr class="{% if date|is_today %}amber lighten-4{% endif %}">
+                        <td>{{ date|date:"D, M d, Y" }}</td>
+                        <td></td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                    </tr>
+                {% endif %}
+
+                {% if forloop.last %}
+                    <tr>
+                        <td colspan="3" class="center-align">Total</td>
+                        <td class="{% if total_expense > 0 %}green-text{% else %}red-text{% endif %}">
+                            {{ total_expense|intcomma|cut:"-" }}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-    
-    <script>
-        $(function() {
-            const datePickerEl = $('.date-picker');
-            datePickerEl.datepicker( {
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                dateFormat: 'MM yy',
-                defaultDate: new Date(),
-                onClose: function(dateText, inst) { 
-                    $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
-                }
-            });
-            datePickerEl.datepicker( "setDate", new Date() );
-        });
-        $( document ).ready(function() {
-            $('[data-bs-toggle="tooltip"]').tooltip();
-        });
-    </script>
 {% endblock %}
+
+{% block secondary_content %}
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th class="center-align" colspan="2">{{ month }} {{ year }}</th>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for name, mode in mode_dict.items %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ mode.cb|floatformat:2|intcomma }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>Total</td>
+                <td>{{ total|floatformat:2|intcomma }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
+<script>
+    // Initialize Materialize tooltips for comments
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltips = document.querySelectorAll('.tooltipped');
+        M.Tooltip.init(tooltips);
+    });
+</script>

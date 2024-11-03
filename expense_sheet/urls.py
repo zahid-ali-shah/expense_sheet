@@ -6,5 +6,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('account.urls')),
     path('', include('core.urls')),
+    path('', include('apps.theme.urls')),
     path('', include("django.contrib.auth.urls"))
 ] + debug_toolbar_urls()
